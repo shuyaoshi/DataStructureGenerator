@@ -4,15 +4,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
 import java.util.LinkedList;
-import java.util.Queue;
 
 @Component
 public class Deque {
     private static final Log log = LogFactory.getLog(Deque.class);
-    private Queue<Integer> headStack;
-    private Queue<Integer> tailStack;
-    private Queue<Integer> bufferStack;
+    private LinkedList<Integer> headStack;
+    private LinkedList<Integer> tailStack;
+    private LinkedList<Integer> bufferStack;
 
     public Deque() {
         headStack = new LinkedList<>();
@@ -21,41 +21,55 @@ public class Deque {
     }
 
     public boolean offerFirst(Integer value) {
-        rebalance();
-        return headStack.offer(value);
+        return headStack.offerLast(value);
     }
 
     public boolean offerLast(Integer value) {
-        rebalance();
-        return tailStack.offer(value);
+        return tailStack.offerLast(value);
     }
 
     public Integer peekFirst() {
         if (headStack.isEmpty()){
             rebalance();
         }
-        return headStack.peek();
+        return headStack.peekLast();
     }
 
     public Integer peekLast() {
         if (tailStack.isEmpty()) {
             rebalance();
         }
-        return tailStack.peek();
+        return tailStack.peekLast();
     }
 
     public Integer pollFirst() {
         if (headStack.isEmpty()){
             rebalance();
         }
-        return headStack.poll();
+        return headStack.pollLast();
     }
 
     public Integer pollLast() {
         if (tailStack.isEmpty()){
             rebalance();
         }
-        return tailStack.poll();
+        return tailStack.pollLast();
+    }
+
+    public boolean offerFirst(Collection<Integer> collections) {
+        boolean isSuccess = true;
+        for (Integer value : collections) {
+            isSuccess = isSuccess && offerFirst(value);
+        }
+        return isSuccess;
+    }
+
+    public boolean offerLast(Collection<Integer> collections) {
+        boolean isSuccess = true;
+        for (Integer value : collections) {
+            isSuccess = isSuccess && offerLast(value);
+        }
+        return isSuccess;
     }
 
     public void clear() {
@@ -83,16 +97,16 @@ public class Deque {
         // no need to do anything if neither stack is empty
     }
 
-    private void rebalanceStacks(Queue<Integer> fromStack, Queue<Integer> toStack, Queue<Integer> bufferStack) {
+    private void rebalanceStacks(LinkedList<Integer> fromStack, LinkedList<Integer> toStack, LinkedList<Integer> bufferStack) {
         int originalSize = fromStack.size();
-        while (fromStack.size() > (originalSize ) / 2) {
-            bufferStack.add(fromStack.poll());
+        while (fromStack.size() > (originalSize + 1) / 2) {
+            bufferStack.offerLast(fromStack.pollLast());
         }
         while (!fromStack.isEmpty()) {
-            toStack.offer(fromStack.poll());
+            toStack.offerLast(fromStack.pollLast());
         }
         while (!bufferStack.isEmpty()) {
-            toStack.offer(bufferStack.poll());
+            fromStack.offerLast(bufferStack.pollLast());
         }
     }
 }
