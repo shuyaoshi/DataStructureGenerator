@@ -1,53 +1,52 @@
 package model;
 
+import org.junit.After;
 import org.junit.Assert;
-import org.junit.Test;
 import org.junit.Before;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-//import static org.mockito.Mockito.*;
+import org.junit.Test;
 
 public class DequeTest {
-    @Mock
-    org.apache.commons.logging.Log log;
-    @Mock
-    java.util.Queue<java.lang.Integer> headStack;
-    @Mock
-    java.util.Queue<java.lang.Integer> tailStack;
-    @Mock
-    java.util.Queue<java.lang.Integer> bufferStack;
-    @InjectMocks
-    model.Deque deque;
+    private Deque deque;
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        deque = new Deque();
+    }
+
+    @After
+    public void tearDown() {
+        deque.clear();
     }
 
     @Test
-    public void testAddFirst() throws Exception {
-        boolean result = deque.addFirst(Integer.valueOf(0));
-        Assert.assertEquals(true, result);
+    public void testFirstFunctions() throws Exception {
+        deque.offerFirst(1);
+        deque.offerFirst(2);
+        Assert.assertEquals(2, deque.peekFirst().intValue());
+        Assert.assertEquals(2, deque.size());
+        Assert.assertEquals(2, deque.pollFirst().intValue());
+        Assert.assertEquals(1, deque.pollFirst().intValue());
+        Assert.assertTrue(deque.isEmpty());
     }
 
     @Test
-    public void testAddLast() throws Exception {
-        boolean result = deque.addLast(Integer.valueOf(0));
-        Assert.assertEquals(true, result);
+    public void testLastFunctions() throws Exception {
+        deque.offerLast(3);
+        deque.offerLast(4);
+        Assert.assertEquals(4, deque.peekLast().intValue());
+        Assert.assertEquals(2, deque.size());
+        Assert.assertEquals(4, deque.pollLast().intValue());
+        Assert.assertEquals(3, deque.pollLast().intValue());
+        Assert.assertTrue(deque.isEmpty());
     }
 
     @Test
-    public void testGetFirst() throws Exception {
-        java.lang.Integer result = deque.getFirst();
-        Assert.assertEquals(Integer.valueOf(0), result);
-    }
-
-    @Test
-    public void testGetLast() throws Exception {
-        java.lang.Integer result = deque.getLast();
-        Assert.assertEquals(Integer.valueOf(0), result);
+    public void testRebalanceFunction() throws Exception {
+        deque.offerFirst(3);
+        deque.offerFirst(100);
+        Assert.assertEquals(3, deque.peekLast().intValue());
+        Assert.assertEquals(100, deque.pollFirst().intValue());
+        Assert.assertEquals(3, deque.pollFirst().intValue());
+        Assert.assertTrue(deque.isEmpty());
     }
 }
-
-//Generated with love by TestMe :) Please report issues and submit feature requests at: http://weirddev.com/forum#!/testme
